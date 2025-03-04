@@ -66,7 +66,7 @@ export const meta: MetaFunction = () => [{ title: "Login" }];
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/notes";
+  const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData<typeof action>();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -160,18 +160,26 @@ export default function LoginPage() {
                 Remember me
               </label>
             </div>
-            <div className="text-center text-sm text-gray-500">
-              Don&apos;t have an account?{" "}
+            <div className="text-sm">
               <Link
-                className="text-blue-500 underline"
-                to={{
-                  pathname: "/join",
-                  search: searchParams.toString(),
-                }}
+                to="/forgot-password"
+                className="text-blue-500 hover:text-blue-700"
               >
-                Sign up
+                Forgot password?
               </Link>
             </div>
+          </div>
+          <div className="text-center text-sm text-gray-500">
+            Don&apos;t have an account?{" "}
+            <Link
+              className="text-blue-500 underline"
+              to={{
+                pathname: "/join",
+                search: searchParams.toString(),
+              }}
+            >
+              Sign up
+            </Link>
           </div>
         </Form>
       </div>

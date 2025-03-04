@@ -61,3 +61,76 @@ export async function verifyLogin(
 
   return userWithoutPassword;
 }
+
+/**
+ * Creates a password reset token for a user that expires in 5 minutes
+ */
+export async function createPasswordResetToken(email: User["email"]) {
+  const user = await getUserByEmail(email);
+  if (!user) return null;
+
+  // Delete any existing reset tokens for this user
+  await prisma.passwordReset.deleteMany({
+    where: { userId: user.id },
+  });
+
+  // Create a new reset token that expires in 5 minutes
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+
+  const passwordReset = await prisma.passwordReset.create({
+    data: {
+      expiresAt,
+      userId: user.id,
+    },
+  });
+
+  return { user, passwordReset };
+}
+
+/**
+ * Verifies a password reset token is valid and not expired
+ */
+export async function verifyPasswordResetToken(token: string) {
+  const passwordReset = await prisma.passwordReset.findUnique({
+    where: { token },
+    include: { user: true },
+  });
+
+  if (!passwordReset) return null;
+  
+  // Check if token has expired
+  const now = new Date();
+  if (now > passwordReset.expiresAt) {
+    // Delete expired token
+    await prisma.passwordReset.delete({
+      where: { token },
+    });
+    return null;
+  }
+
+  return passwordReset;
+}
+
+/**
+ * Resets a user's password using a valid token
+ */
+export async function resetPassword(token: string, newPassword: string) {
+  const passwordReset = await verifyPasswordResetToken(token);
+  if (!passwordReset) return null;
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update the user's password
+  await prisma.password.update({
+    where: { userId: passwordReset.userId },
+    data: { hash: hashedPassword },
+  });
+
+  // Delete the reset token
+  await prisma.passwordReset.delete({
+    where: { token },
+  });
+
+  return passwordReset.user;
+}

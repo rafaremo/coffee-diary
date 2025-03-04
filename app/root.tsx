@@ -10,6 +10,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
+import { Toaster } from "~/components/ui/sonner";
 import { getUser } from "~/session.server";
 import stylesheet from "~/tailwind.css";
 
@@ -33,6 +34,7 @@ export default function App() {
       </head>
       <body className="h-full">
         <Outlet />
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

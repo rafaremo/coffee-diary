@@ -1,8 +1,77 @@
-# Remix Indie Stack
+# ☕ Coffee Diary
 
-![The Remix Indie Stack](https://repository-images.githubusercontent.com/465928257/a241fa49-bd4d-485a-a2a5-5cb8e4ee0abf)
+A web application to track your daily coffee consumption and experiences. Built with Remix, PocketBase, and shadcn/ui.
 
-Learn more about [Remix Stacks](https://remix.run/stacks).
+## Features
+
+- 🔐 User authentication
+- ☕ Track coffee entries with:
+  - Preparation method (Espresso, Pour Over, French Press, etc.)
+  - Number of espresso shots
+  - Flavor description
+  - Rating (0-5)
+  - Detailed description
+- 📱 Responsive design with shadcn/ui
+- 📊 View, edit, and delete your coffee entries
+
+## Tech Stack
+
+- [Remix](https://remix.run/) - Full-stack web framework
+- [PocketBase](https://pocketbase.io/) - Backend and authentication
+- [Prisma](https://www.prisma.io/) - Database ORM
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- PocketBase server (optional for local development)
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/coffee-diary.git
+   cd coffee-diary
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   ```
+   cp .env.example .env
+   ```
+   
+   Edit the `.env` file with your configuration.
+
+4. Initialize the database:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+5. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+6. Open your browser and navigate to `http://localhost:3000`
+
+## Deployment
+
+This app can be deployed to any platform that supports Remix applications, such as Vercel, Netlify, or Fly.io.
+
+For PocketBase, you'll need to set up a PocketBase server and configure the environment variables accordingly.
+
+## License
+
+MIT
 
 ```sh
 npx create-remix@latest --template remix-run/indie-stack

@@ -40,9 +40,24 @@ RUN npm run build
 # Finally, build the production image with minimal footprint
 FROM base
 
-ENV DATABASE_URL=file:/data/sqlite.db
-ENV PORT="8080"
+# Default values for build-time variables
+ARG DATABASE_URL_DEFAULT=file:/data/sqlite.db
+ARG PORT_DEFAULT=8080
+ARG SESSION_SECRET_DEFAULT="super-duper-s3cret"
+ARG POCKETBASE_URL_DEFAULT="http://127.0.0.1:8090"
+ARG MAILGUN_API_KEY_DEFAULT=""
+ARG MAILGUN_DOMAIN_DEFAULT=""
+ARG APP_URL_DEFAULT="http://localhost:3000"
+
+# Environment variables that can be overridden at runtime
+ENV DATABASE_URL=${DATABASE_URL_DEFAULT}
+ENV PORT=${PORT_DEFAULT}
 ENV NODE_ENV="production"
+ENV SESSION_SECRET=${SESSION_SECRET_DEFAULT}
+ENV POCKETBASE_URL=${POCKETBASE_URL_DEFAULT}
+ENV MAILGUN_API_KEY=${MAILGUN_API_KEY_DEFAULT}
+ENV MAILGUN_DOMAIN=${MAILGUN_DOMAIN_DEFAULT}
+ENV APP_URL=${APP_URL_DEFAULT}
 
 # add shortcut for connecting to database CLI
 RUN echo "#!/bin/sh\nset -x\nsqlite3 \$DATABASE_URL" > /usr/local/bin/database-cli && chmod +x /usr/local/bin/database-cli
@@ -57,5 +72,7 @@ COPY --from=build /myapp/public /myapp/public
 COPY --from=build /myapp/package.json /myapp/package.json
 COPY --from=build /myapp/start.sh /myapp/start.sh
 COPY --from=build /myapp/prisma /myapp/prisma
+
+RUN mkdir -p /data
 
 ENTRYPOINT [ "./start.sh" ]
