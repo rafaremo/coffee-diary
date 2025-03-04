@@ -69,4 +69,69 @@ The Coffee Diary Team`
     console.error("Failed to send password reset email:", error);
     return false;
   }
-} 
+}
+
+/**
+ * Sends an email confirmation email to the user with a verification link
+ */
+export async function sendEmailConfirmation(user: User, confirmationToken: string) {
+  try {
+    invariant(MAILGUN_API_KEY, "MAILGUN_API_KEY must be set");
+    invariant(MAILGUN_DOMAIN, "MAILGUN_DOMAIN must be set");
+
+    const confirmationUrl = `${APP_URL}/confirm-email/${confirmationToken}`;
+    const formData = new FormData();
+    
+    formData.append("from", `Coffee Diary <noreply@${MAILGUN_DOMAIN}>`);
+    formData.append("to", user.email);
+    formData.append("subject", "Confirm Your Coffee Diary Email");
+    formData.append(
+      "text",
+      `Hello${user.name ? ` ${user.name}` : ''},
+
+Thanks for signing up for a Coffee Diary account!
+
+Please click the link below to confirm your email address. This link will expire in 24 hours:
+
+${confirmationUrl}
+
+If you did not sign up for Coffee Diary, please ignore this email.
+
+Thanks,
+The Coffee Diary Team`
+    );
+    formData.append(
+      "html",
+      `<p>Hello${user.name ? ` ${user.name}` : ''},</p>
+<p>Thanks for signing up for a Coffee Diary account!</p>
+<p>Please click the link below to confirm your email address. This link will expire in 24 hours:</p>
+<p><a href="${confirmationUrl}" style="padding: 10px 15px; background: #3B82F6; color: white; text-decoration: none; border-radius: 5px;">Confirm Email</a></p>
+<p>If you did not sign up for Coffee Diary, please ignore this email.</p>
+<p>Thanks,<br>The Coffee Diary Team</p>`
+    );
+
+    // Make the API call to Mailgun
+    const response = await fetch(
+      `https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Basic ${btoa(`api:${MAILGUN_API_KEY}`)}`,
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const responseData = await response.text();
+      console.error("Mailgun API error:", responseData);
+      return false;
+    }
+
+    console.log(`Sent confirmation email to ${user.email} with token ${confirmationToken}`);
+    return true;
+  } catch (error) {
+    console.error("Failed to send email confirmation:", error);
+    return false;
+  }
+}

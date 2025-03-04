@@ -22,6 +22,43 @@ export function getCoffeeListItems({ userId }: { userId: User["id"] }) {
   });
 }
 
+export function getCoffeeListItemsPaginated({ 
+  userId, 
+  page = 1, 
+  perPage = 10 
+}: { 
+  userId: User["id"];
+  page?: number;
+  perPage?: number;
+}) {
+  return prisma.$transaction(async (tx) => {
+    const totalItems = await tx.coffee.count({
+      where: { userId },
+    });
+    
+    const totalPages = Math.ceil(totalItems / perPage);
+    
+    const items = await tx.coffee.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * perPage,
+      take: perPage,
+    });
+    
+    return {
+      items,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        perPage,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      }
+    };
+  });
+}
+
 export function createCoffee({
   name,
   brand,

@@ -1,12 +1,12 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { Form, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
+import { getCoffeeListItems } from "~/models/coffee.server";
 import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
-import { getCoffeeListItems } from "~/models/coffee.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request);
@@ -22,6 +22,8 @@ export default function CoffeesPage() {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  console.log(`Loaded ${data.coffeeListItems.length} coffee entries`);
 
   return (
     <div className="flex h-full min-h-screen flex-col">
@@ -71,6 +73,12 @@ export default function CoffeesPage() {
               </Button>
             </Link>
             
+            <Link to="feed" className="block px-4 pb-4 text-xl text-blue-500">
+              <Button className="w-full" variant="outline">
+                📋 Coffee Feed
+              </Button>
+            </Link>
+            
             <Link to="stats" className="block px-4 pb-4 text-xl text-blue-500">
               <Button className="w-full" variant="outline">
                 📊 Statistics
@@ -79,40 +87,9 @@ export default function CoffeesPage() {
 
             <hr />
 
-            {data.coffeeListItems.length === 0 ? (
-              <div className="p-4">No coffee entries yet</div>
-            ) : (
-              <ol>
-                {data.coffeeListItems.map((coffee) => (
-                  <li key={coffee.id}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        `block border-b p-4 text-lg md:text-xl ${isActive ? "bg-white" : ""}`
-                      }
-                      to={coffee.id}
-                      onClick={() => {
-                        // Close sidebar on mobile when clicking a link
-                        if (window.innerWidth < 768) {
-                          setSidebarOpen(false);
-                        }
-                      }}
-                    >
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between flex-wrap">
-                          <span className="font-medium truncate">{coffee.name}</span>
-                          <span className="flex items-center text-sm">
-                            Rating: {coffee.rating}/5
-                          </span>
-                        </div>
-                        <div className="text-sm text-gray-500 truncate">
-                          {coffee.brand} - {coffee.preparation}
-                        </div>
-                      </div>
-                    </NavLink>
-                  </li>
-                ))}
-              </ol>
-            )}
+            <div className="p-4 text-center text-gray-500">
+              With ❤️ from <a href="https://rafa.page" target="_blank" rel="noopener noreferrer">RafaRemo</a>
+            </div>
           </div>
         </div>
 

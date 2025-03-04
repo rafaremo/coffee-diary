@@ -7,6 +7,7 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 
+import { Button } from "~/components/ui/button";
 import { createPasswordResetToken, getUserByEmail } from "~/models/user.server";
 import { sendPasswordResetEmail } from "~/services/email.server";
 import { getUserId } from "~/session.server";
@@ -90,6 +91,9 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex min-h-full flex-col justify-center">
       <div className="mx-auto w-full max-w-md px-8">
+        <div className="flex justify-center mb-6">
+          <h1 className="text-2xl font-bold">☕ Coffee Diary</h1>
+        </div>
         <h1 className="text-2xl font-bold text-center mb-6">Reset Password</h1>
         
         {actionData?.status === "success" ? (
@@ -130,13 +134,13 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+              className="w-full"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Sending reset link..." : "Send Password Reset Link"}
-            </button>
+            </Button>
             
             <div className="flex items-center justify-center">
               <div className="text-center text-sm text-gray-500">

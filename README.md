@@ -22,6 +22,7 @@ A web application to track your daily coffee consumption and experiences. Built 
 - [shadcn/ui](https://ui.shadcn.com/) - UI components
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [TypeScript](https://www.typescriptlang.org/) - Type safety
+- [AWS S3](https://aws.amazon.com/s3/) - Cloud storage for user avatars
 
 ## Getting Started
 
@@ -72,6 +73,100 @@ For PocketBase, you'll need to set up a PocketBase server and configure the envi
 ## License
 
 MIT
+
+## Environment Variables
+
+The following environment variables need to be set:
+
+```sh
+# Database
+DATABASE_URL="file:./data.db?connection_limit=1"
+SESSION_SECRET="your-session-secret"
+POCKETBASE_URL="http://your-pocketbase-url:8090"
+
+# Email (for password reset)
+MAILGUN_API_KEY="your-mailgun-api-key"
+MAILGUN_DOMAIN="your-mailgun-domain"
+APP_URL="http://localhost:3000"
+
+# AWS S3 (for avatar uploads)
+AWS_ACCESS_KEY_ID="your-aws-access-key-id"
+AWS_SECRET_ACCESS_KEY="your-aws-secret-access-key"
+AWS_REGION="your-aws-region" # e.g., us-east-1
+AWS_S3_BUCKET="your-s3-bucket-name"
+```
+
+Create a `.env` file at the root of the project with these variables. You can copy the example from `.env.example`.
+
+## S3 Configuration
+
+For avatar uploads to work properly, you need to:
+
+1. Create an AWS S3 bucket or use an S3-compatible service (Cloudflare R2, MinIO, DigitalOcean Spaces, etc.)
+2. Create an IAM user with programmatic access and the necessary S3 permissions (for AWS) or equivalent access keys for other services
+3. Configure CORS on your storage service to allow uploads from your application
+4. Add the credentials to your environment variables
+
+### Using AWS S3
+
+Basic S3 bucket CORS configuration:
+
+```json
+[
+  {
+    "AllowedHeaders": ["*"],
+    "AllowedMethods": ["GET", "PUT", "POST", "DELETE"],
+    "AllowedOrigins": ["http://localhost:3000", "https://your-production-domain.com"],
+    "ExposeHeaders": []
+  }
+]
+```
+
+Minimum IAM policy required:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name",
+        "arn:aws:s3:::your-bucket-name/*"
+      ]
+    }
+  ]
+}
+```
+
+### Using S3-Compatible Services
+
+For services like Cloudflare R2, MinIO, DigitalOcean Spaces, or other S3-compatible services, you'll need to set these environment variables:
+
+```sh
+AWS_ACCESS_KEY_ID="your-access-key"
+AWS_SECRET_ACCESS_KEY="your-secret-key"
+AWS_REGION="your-region"  # Often required but may not be used by all services
+AWS_S3_BUCKET="your-bucket-name"
+AWS_S3_ENDPOINT="https://your-custom-endpoint.com"  # The service's S3-compatible endpoint
+```
+
+For example, with Cloudflare R2:
+```sh
+AWS_S3_ENDPOINT="https://youraccount.r2.cloudflarestorage.com"
+```
+
+With MinIO:
+```sh
+AWS_S3_ENDPOINT="http://your-minio-server:9000"
+```
+
+The application will automatically detect the custom endpoint and use the appropriate URL format for your storage provider.
 
 ```sh
 npx create-remix@latest --template remix-run/indie-stack
